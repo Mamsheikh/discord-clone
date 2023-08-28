@@ -1,8 +1,10 @@
 "use client";
 
 import * as z from "zod";
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -23,17 +25,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { FileUpload } from "@/components/file-upload";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-    name: z.string().min(1, {
-      message: "Server name is required."
-    }),
-    imageUrl: z.string().min(1, {
-      message: "Server image is required."
-    })
-  });
+  name: z.string().min(1, {
+    message: "Server name is required.",
+  }),
+  imageUrl: z.string().min(1, {
+    message: "Server image is required.",
+  }),
+});
 export const InitialModal = () => {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsMounted(true);
@@ -44,13 +50,24 @@ export const InitialModal = () => {
     defaultValues: {
       name: "",
       imageUrl: "",
-    }
+    },
   });
 
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      await axios.post("/api/servers", values);
+      form.reset();
+      toast({
+        title: "Server created successfully",
+        description: `${values.name}`,
+      });
+      router.refresh();
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   if (!isMounted) return null;
@@ -73,11 +90,11 @@ export const InitialModal = () => {
                 <FormField
                   control={form.control}
                   name="imageUrl"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormControl>
                         <FileUpload
-                          endpoint='serverImage'
+                          endpoint="serverImage"
                           value={field.value}
                           onChange={field.onChange}
                         />
