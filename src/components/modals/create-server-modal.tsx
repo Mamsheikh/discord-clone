@@ -64,6 +64,7 @@ export const CreateServerModal = () => {
         description: `${values.name}`,
       });
       router.refresh();
+      onClose();
     } catch (error) {
       console.log(error);
     }
