@@ -74,6 +74,9 @@ export const MembersModal = () => {
 
       router.refresh();
       onOpen("members", { server: response.data });
+      toast({
+        title: `Member role changed to ${role}`,
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -95,6 +98,9 @@ export const MembersModal = () => {
 
       router.refresh();
       onOpen("members", { server: response.data });
+      toast({
+        title: "Member kicked 🦶 out of server",
+      });
     } catch (error) {
       console.log(error);
     } finally {
